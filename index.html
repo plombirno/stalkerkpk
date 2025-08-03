@@ -7,8 +7,10 @@
 <style>
   /* Рамка смартфона */
   .phone-frame {
-    width: 420px;
-    height: 810px;
+    width: 90vw;         /* Занимает 90% ширины окна */
+    max-width: 420px;    /* Но не больше 420px */
+    aspect-ratio: 210 / 405; /* Соотношение сторон 420:810 */
+    height: auto;        /* Высота рассчитывается автоматически */
     margin: 30px auto;
     background: #111;
     border-radius: 48px;
@@ -215,6 +217,21 @@
   @keyframes noise-move {
     0% {background-position: 0 0;}
     100% {background-position: 100px 100px;}
+  }
+
+  /* Медиа-запрос для совсем маленьких экранов */
+  @media (max-width: 350px) {
+    .phone-frame {
+      width: 95vw;
+      max-width: 320px;
+      aspect-ratio: 210 / 405;
+      padding: 25px 15px 40px 15px;
+    }
+    .pda-screen {
+      max-width: 280px;
+      max-height: 520px;
+      padding: 20px 15px 30px 15px;
+    }
   }
 </style>
 </head>
