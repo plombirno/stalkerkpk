@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>КПК S.T.A.L.K.E.R.</title>
+<style>
+  /* Рамка смартфона */
+  .phone-frame {
+    width: 420px;
+    height: 810px;
+    margin: 30px auto;
+    background: #111;
+    border-radius: 48px;
+    box-shadow:
+      inset 0 0 10px #070707,
+      0 0 20px #0af85a88;
+    position: relative;
+    padding: 38px 20px 50px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+
+    animation: shake 5s infinite alternate;
+    transform-origin: center center;
+  }
+  .phone-frame::before {
+    content: "";
+    position: absolute;
+    top: 10px; bottom: 10px;
+    left: 10px; right: 10px;
+    border: 2.5px solid #0f3d13;
+    border-radius: 40px;
+    pointer-events: none;
+  }
+  .phone-notch {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 12px;
+    background: #101a0d;
+    border-radius: 8px / 50%;
+    box-shadow:
+      inset 0 0 5px #0b2e0a,
+      0 0 6px #14c948aa;
+    z-index: 10;
+  }
+  .phone-bottom-bar {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 12px;
+    background: #101a0d;
+    border-radius: 20px;
+    box-shadow:
+      inset 0 0 5px #0b2e0a,
+      0 0 8px #14c948cc;
+    z-index: 10;
+  }
+
+  /* Экран КПК с атмосферой */
+  .pda-screen {
+    width: 100%;
+    height: 100%;
+    max-width: 380px;
+    max-height: 740px;
+    background: linear-gradient(120deg, #213a23 60%, #2a5b38 100%);
+    border: 2px solid #5f9c6a;
+    box-shadow: 0 0 40px #1eea4b55, 0 0 60px #23fe7f33;
+    animation: flicker 2.5s infinite;
+    border-radius: 30px;
+    color: #90ffb3;
+    font-family: 'Orbitron', monospace;
+    position: relative;
+    padding: 25px 20px 40px 20px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    transform-origin: center center;
+  }
+  @keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { box-shadow: 0 0 40px #1eea4b55, 0 0 60px #23fe7f33; }
+    20%, 22%, 24%, 55% { box-shadow: 0 0 10px #1eea4b11, 0 0 16px #23fe7f11; }
+  }
+
+  /* Анимация дрожания */
+  @keyframes shake {
+    0% { transform: translate(0, 0); }
+    2% { transform: translate(-1px, 2px); }
+    4% { transform: translate(1px, -2px); }
+    6% { transform: translate(-1px, 1px); }
+    8% { transform: translate(1px, 1px); }
+    10% { transform: translate(0, 0); }
+    100% { transform: translate(0, 0); }
+  }
+
+  h1 {
+    font-size: 1.6em; margin-bottom: 12px; text-align: center;
+  }
+
+  /* Верхний правый угол - проценты и Wi-Fi */
+  .top-right {
+    position: absolute;
+    top: 25px;
+    right: 30px;
+    font-family: 'Orbitron', monospace;
+    color: #90ffb3;
+    font-size: 0.9em;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 1100;
+  }
+  .wifi {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+  }
+  .wifi-bar {
+    width: 4px;
+    background: #36e36c;
+    border-radius: 2px 2px 0 0;
+    box-shadow: 0 0 6px #36e36c88;
+    animation: none;
+  }
+  .wifi-bar:nth-child(1) {
+    height: 6px;
+  }
+  .wifi-bar:nth-child(2) {
+    height: 10px;
+  }
+  .wifi-bar:nth-child(3) {
+    height: 14px;
+    animation: wifi-blink 1.2s infinite;
+  }
+  @keyframes wifi-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .menu button {
+    width: 100%; padding: 12px; margin: 6px 0;
+    background: #222f22; color: #90ffb3; border: 1px solid #36e36c; border-radius: 6px;
+    cursor: pointer; font-size: 1em;
+    transition: background 0.3s;
+    user-select: none;
+  }
+  .menu button:hover {
+    background: #273c28;
+  }
+  #content {
+    margin-top: 15px; min-height: 150px;
+  }
+  .quest-item, .achievement-item, .log-item, .encyclopedia-item {
+    margin-bottom: 10px; padding: 8px; border: 1px solid #36e36c; border-radius: 8px;
+    background: #152215;
+    box-shadow: inset 0 0 6px #2efc7e88;
+    opacity: 0;
+    transform: scale(0.97);
+    transition: all 0.24s cubic-bezier(.4,2,.5,1);
+  }
+  .quest-item.active, .achievement-item.active, .log-item.active, .encyclopedia-item.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .btn-small {
+    background: #36e36c; color: #0b170a; border: none; border-radius: 4px;
+    padding: 4px 8px; cursor: pointer; font-size: 0.9em;
+    margin-left: 10px;
+    transition: background 0.3s;
+  }
+  .btn-small:hover {
+    background: #2bc05d;
+  }
+
+  /* Мигающие лампочки-индикаторы */
+  .indicator-row {
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .led {
+    display: inline-block;
+    width: 10px; height: 10px;
+    margin: 0 6px;
+    border-radius: 50%;
+    background: #1a1;
+    box-shadow: 0 0 8px #1e5;
+    opacity: 0.5;
+    animation: led-blink 2.1s infinite;
+  }
+  .led.on { opacity: 1; animation-delay: 0s;}
+  .led:nth-child(2) { animation-delay: 0.7s;}
+  .led:nth-child(3) { animation-delay: 1.3s;}
+  @keyframes led-blink {
+    0%, 100% { opacity: 1; }
+    60% { opacity: 0.4; }
+    80% { opacity: 1; }
+  }
+
+  /* Эффект "старого экрана" шум/зерно */
+  .screen-noise {
+    pointer-events: none;
+    position: fixed; left:0; top:0;
+    width: 100vw; height: 100vh;
+    background: url('https://www.transparenttextures.com/patterns/noise.png');
+    opacity: 0.10;
+    z-index: 1000;
+    animation: noise-move 0.5s infinite;
+  }
+  @keyframes noise-move {
+    0% {background-position: 0 0;}
+    100% {background-position: 100px 100px;}
+  }
+</style>
+</head>
+<body>
+<div class="screen-noise"></div>
+
+<div class="phone-frame">
+  <div class="phone-notch"></div>
+  <div class="phone-bottom-bar"></div>
+
+  <div class="pda-screen">
+    <div class="top-right">
+      <div>68%</div>
+      <div class="wifi">
+        <div class="wifi-bar"></div>
+        <div class="wifi-bar"></div>
+        <div class="wifi-bar"></div>
+      </div>
+    </div>
+
+    <h1>📱 КПК S.T.A.L.K.E.R.</h1>
+
+    <div class="indicator-row">
+      <span class="led on"></span>
+      <span class="led"></span>
+      <span class="led"></span>
+    </div>
+
+    <div class="menu">
+      <button onclick="showSection('quests')">Задания</button>
+      <button onclick="showSection('achievements')">Достижения</button>
+      <button onclick="showSection('log')">Дневник</button>
+      <button onclick="showSection('encyclopedia')">Энциклопедия</button>
+      <button onclick="showSection('rating')">Рейтинг</button>
+      <button onclick="showSection('contacts')">Контакты</button>
+    </div>
+
+    <div id="content">Добро пожаловать в КПК!</div>
+  </div>
+</div>
+
+<audio id="radio" src="https://opengameart.org/sites/default/files/radio-static.mp3" preload="auto" loop></audio>
+
+<script>
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+
+  const radio = document.getElementById('radio');
+  radio.volume = 0.15;
+  radio.play().catch(() => {
+    console.log("Автозапуск звука заблокирован браузером");
+  });
+
+  const data = {
+    quests: [
+      {id:1, title:"Найти артефакт", description:"Найти и принести артефакт Сидоровичу", progress:0, goal:1, status:"в процессе", reward:"500₴"},
+      {id:2, title:"Убить мутантов", description:"Убить 5 мутантов", progress:2, goal:5, status:"в процессе", reward:"1000₴"},
+      {id:3, title:"Передать данные", description:"Отправить отчёт научному сотруднику", progress:1, goal:1, status:"готово", reward:"1500₴"}
+    ],
+    achievements: [
+      {id:1, title:"Первый артефакт", description:"Собран первый артефакт", icon:"🏅"},
+      {id:2, title:"Победа над мутантом", description:"Убил первого мутанта", icon:"🏆"}
+    ],
+    log: [
+      "Встреча со сталкером Петровичем.",
+      "Обнаружен новый артефакт Медуза.",
+      "Убито 2 мутанта в зоне Свалка."
+    ],
+    encyclopedia: [
+      {title:"Псевдособака", description:"Опасный мутант, быстрый и агрессивный."},
+      {title:"Артефакт Медуза", description:"Редкий артефакт с аномальными свойствами."}
+    ],
+    rating: [
+      {name:"Stalker123", faction:"Сталкер", money:5000},
+      {name:"BanditX", faction:"Бандит", money:3000}
+    ],
+    contacts: [
+      {name:"Петрович", status:"онлайн"},
+      {name:"Сидорович", status:"офлайн"}
+    ]
+  };
+
+  function showSection(section) {
+    const content = document.getElementById("content");
+    content.innerHTML = "";
+
+    if(section === "quests") {
+      content.innerHTML = "<h2>Задания</h2>";
+      data.quests.forEach(q => {
+        const questDiv = document.createElement("div");
+        questDiv.className = "quest-item";
+        questDiv.innerHTML = `<b>${q.title}</b> (${q.status})<br>${q.description}<br>Прогресс: ${q.progress}/${q.goal}<br>Награда: ${q.reward}`;
+        if(q.status === "в процессе") {
+          const btn = document.createElement("button");
+          btn.className = "btn-small";
+          btn.innerText = "Отметить выполненным";
+          btn.onclick = () => markQuestDone(q.id);
+          questDiv.appendChild(btn);
+        }
+        content.appendChild(questDiv);
+        setTimeout(() => questDiv.classList.add('active'), 10);
+      });
+    }
+    else if(section === "achievements") {
+      content.innerHTML = "<h2>Достижения</h2>";
+      data.achievements.forEach(a => {
+        const achDiv = document.createElement("div");
+        achDiv.className = "achievement-item";
+        achDiv.innerHTML = `${a.icon} <b>${a.title}</b><br>${a.description}`;
+        content.appendChild(achDiv);
+        setTimeout(() => achDiv.classList.add('active'), 10);
+      });
+    }
+    else if(section === "log") {
+      content.innerHTML = "<h2>Дневник</h2>";
+      data.log.forEach(entry => {
+        const logDiv = document.createElement("div");
+        logDiv.className = "log-item";
+        logDiv.innerText = entry;
+        content.appendChild(logDiv);
+        setTimeout(() => logDiv.classList.add('active'), 10);
+      });
+    }
+    else if(section === "encyclopedia") {
+      content.innerHTML = "<h2>Энциклопедия</h2>";
+      data.encyclopedia.forEach(e => {
+        const encDiv = document.createElement("div");
+        encDiv.className = "encyclopedia-item";
+        encDiv.innerHTML = `<b>${e.title}</b><br>${e.description}`;
+        content.appendChild(encDiv);
+        setTimeout(() => encDiv.classList.add('active'), 10);
+      });
+    }
+    else if(section === "rating") {
+      content.innerHTML = "<h2>Рейтинг</h2>";
+      data.rating.forEach(r => {
+        const rDiv = document.createElement("div");
+        rDiv.innerHTML = `<b>${r.name}</b> (${r.faction}) — ${r.money}₴`;
+        content.appendChild(rDiv);
+        setTimeout(() => rDiv.classList.add('active'), 10);
+      });
+    }
+    else if(section === "contacts") {
+      content.innerHTML = "<h2>Контакты</h2>";
+      data.contacts.forEach(c => {
+        const cDiv = document.createElement("div");
+        cDiv.innerHTML = `${c.name} — <i>${c.status}</i>`;
+        content.appendChild(cDiv);
+        setTimeout(() => cDiv.classList.add('active'), 10);
+      });
+    }
+    else {
+      content.innerHTML = "Раздел в разработке.";
+    }
+  }
+
+  function markQuestDone(id) {
+    const quest = data.quests.find(q => q.id === id);
+    if (quest && quest.status === "в процессе") {
+      quest.status = "готово";
+      quest.progress = quest.goal;
+
+      const sendData = {
+        action: "quest_done",
+        quest_id: id
+      };
+      if (tg && tg.sendData) {
+        tg.sendData(JSON.stringify(sendData));
+        console.log("Отправлены данные в бота:", sendData);
+      } else {
+        console.warn("Telegram WebApp API не доступен");
+      }
+
+      alert(`Задание "${quest.title}" отмечено как выполненное! Награда: ${quest.reward}`);
+      showSection("quests");
+    }
+  }
+
+  showSection("quests");
+</script>
+</body>
+</html>
